@@ -21,9 +21,6 @@ jobs:
           - { os: macos-13,         arch: amd64, java-arch: x64,    type: dmg }
           - { os: macos-latest,     arch: arm64, java-arch: aarch64, type: dmg }
           - { os: windows-latest,   arch: amd64, java-arch: x64,    type: exe }
-          # Windows arm64 has no GitHub-hosted runner. To build it, register a
-          # self-hosted arm64 Windows runner and uncomment the line below:
-          # - { os: [self-hosted, windows, arm64], arch: arm64, type: msi }
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -34,9 +31,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          architecture: ${{ matrix.java-arch }}
+          architecture: x64
 
-      - name: Set up Gradle (download via curl, bypass the wrapper downloader)
+      - name: Set up Gradle (curl)
         shell: bash
         run: |
           for url in \
@@ -50,8 +47,7 @@ jobs:
           unzip -q gradle.zip
           echo "GRADLE=$PWD/gradle-8.10/bin/gradle" >> "$GITHUB_ENV"
 
-      - name: Build package (Unix)
-        if: runner.os != 'Windows'
+      - name: Build package
         shell: bash
         env:
           JAVA_OPTS: -Djava.net.preferIPv4Stack=true
@@ -60,17 +56,9 @@ jobs:
           chmod +x "$GRADLE"
           "$GRADLE" jpackage -PinstallerType=${{ matrix.type }} --no-daemon
 
-      - name: Build package (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        env:
-          JAVA_OPTS: -Djava.net.preferIPv4Stack=true
-          GRADLE_OPTS: -Djava.net.preferIPv4Stack=true
-        run: "$GRADLE" jpackage -PinstallerType=${{ matrix.type }} --no-daemon
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RainText-${{ matrix.os }}-${{ matrix.arch }}
+          name: RainText-test
           path: build/jpackage/*
           if-no-files-found: error
