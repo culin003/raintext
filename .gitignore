@@ -20,3 +20,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local GitHub PAT (gitignored, do not commit)
+.raintext_pat

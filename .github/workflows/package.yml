@@ -1,0 +1,71 @@
+name: Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: ${{ matrix.os }} / ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,    arch: amd64, type: deb }
+          - { os: ubuntu-24.04-arm, arch: arm64, type: deb }
+          - { os: macos-13,         arch: amd64, type: dmg }
+          - { os: macos-latest,     arch: arm64, type: dmg }
+          - { os: windows-latest,   arch: amd64, type: msi }
+          # Windows arm64 has no GitHub-hosted runner. To build it, register a
+          # self-hosted arm64 Windows runner and uncomment the line below:
+          # - { os: [self-hosted, windows, arm64], arch: arm64, type: msi }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          architecture: ${{ matrix.arch == 'arm64' && 'aarch64' || 'x64' }}
+          cache: 'gradle'
+
+      - name: Install WiX (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Invoke-WebRequest -Uri https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip -OutFile wix.zip
+          Expand-Archive wix.zip -DestinationPath wix
+          echo "$env:GITHUB_WORKSPACE\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Grant execute permission for gradlew
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+
+      - name: Build package (Unix)
+        if: runner.os != 'Windows'
+        run: ./gradlew jpackage -PinstallerType=${{ matrix.type }} --no-daemon
+
+      - name: Build package (Windows)
+        if: runner.os == 'Windows'
+        run: .\gradlew.bat jpackage -PinstallerType=${{ matrix.type }} --no-daemon
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RainText-${{ matrix.os }}-${{ matrix.arch }}
+          path: build/jpackage/*
+          if-no-files-found: error
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/jpackage/*

@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.beryx.jlink' version '3.0.1'
 }
 
 group = 'com.raintext'
@@ -35,6 +36,26 @@ dependencies {
 
 application {
     mainClass = 'com.raintext.RainTextApplication'
+}
+
+// Build a platform-specific, self-contained native package (exe/msi, dmg, deb)
+// via jpackage. The javafx modules are added explicitly so the linked runtime
+// image includes them. Run with -PinstallerType=deb|dmg|msi on the matching OS.
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'RainText'
+    }
+    addModules('javafx.controls', 'javafx.fxml', 'javafx.base', 'javafx.graphics')
+    jpackage {
+        installerName = 'RainText'
+        appVersion = project.version
+        vendor = 'RainText'
+        licenseFile = 'LICENSE'
+        if (project.hasProperty('installerType')) {
+            installerType = project.property('installerType') as String
+        }
+    }
 }
 
 tasks.named('test') {
