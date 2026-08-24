@@ -1,0 +1,51 @@
+name: PkgTest
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          architecture: x64
+
+      - name: Set up Gradle (curl)
+        shell: bash
+        run: |
+          for url in \
+            "https://services.gradle.org/distributions/gradle-8.10-bin.zip" \
+            "https://mirrors.cloud.tencent.com/gradle/gradle-8.10-bin.zip" \
+            "https://github.com/culin003/raintext/releases/download/gradle-dist-v8.10/gradle-8.10-bin.zip" ; do
+            echo "trying $url"
+            if curl -fsSL -o gradle.zip "$url"; then echo "downloaded from $url"; break; fi
+          done
+          ls -la gradle.zip
+          unzip -q gradle.zip
+          echo "GRADLE=$PWD/gradle-8.10/bin/gradle" >> "$GITHUB_ENV"
+
+      - name: Build package
+        shell: bash
+        run: |
+          chmod +x "$GRADLE"
+          "$GRADLE" jpackage -PinstallerType=deb --no-daemon
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RainText-test
+          path: build/jpackage/*
+          if-no-files-found: error
