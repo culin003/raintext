@@ -27,7 +27,7 @@ jobs:
           curl -s -o /dev/null -w "plugin page: %{http_code}\n" https://plugins.gradle.org/plugin/org.openjfx.javafxplugin
           curl -s -o /dev/null -w "marker pom: %{http_code}\n" "https://plugins.gradle.org/m2/org/openjfx/javafxplugin/org.openjfx.javafxplugin.gradle.plugin/0.1.0/org.openjfx.javafxplugin.gradle.plugin-0.1.0.pom"
           echo "=== test gradle with HTTP/1.1 forced ==="
-          export JAVA_OPTS="-Djdk.httpclient.HttpClient.allowedProtocols=HTTP/1.1"
+          export GRADLE_OPTS="-Djdk.httpclient.HttpClient.allowedProtocols=HTTP/1.1"
           "$GRADLE" help --stacktrace --no-daemon > /tmp/g.log 2>&1 || true
           echo "=== resolution details ==="
           grep -nE "plugins.gradle.org|aliyun|maven.aliyun|Resource |Download |GET |Could not|Received status|404|200|403|redirect|Resolving|not found|https|BUILD" /tmp/g.log | head -50
