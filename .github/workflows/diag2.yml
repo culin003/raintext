@@ -1,0 +1,32 @@
+name: Diag2
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connectivity curl vs java
+        shell: bash
+        run: |
+          echo "=== env proxies ==="
+          env | grep -iE "proxy" || echo "no proxy env"
+          echo "=== curl ==="
+          for h in https://services.gradle.org/distributions/gradle-8.10-bin.zip https://plugins.gradle.org/m2/ https://repo1.maven.org/maven2/ https://maven.aliyun.com/repository/central/ ; do
+            echo "curl $h -> $(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$h")"
+          done
+          echo "=== java tcp ==="
+          cat > Conn.java <<'EOF'
+          import java.net.*;
+          public class Conn { public static void main(String[] a) throws Exception {
+            for (String h: new String[]{"services.gradle.org","plugins.gradle.org","repo1.maven.org","maven.aliyun.com"}) {
+              try { Socket s=new Socket(); s.connect(new InetSocketAddress(InetAddress.getByName(h),443),5000); System.out.println(h+" JAVA OK"); s.close(); }
+              catch(Exception e){ System.out.println(h+" JAVA FAIL "+e); }
+            }
+          }}
+          EOF
+          javac Conn.java && java Conn
