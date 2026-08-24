@@ -11,7 +11,17 @@ permissions:
 
 jobs:
   package:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,    arch: amd64, java-arch: x64,    type: deb }
+          - { os: ubuntu-24.04-arm, arch: arm64, java-arch: aarch64, type: deb }
+          - { os: macos-13,         arch: amd64, java-arch: x64,    type: dmg }
+          - { os: macos-latest,     arch: arm64, java-arch: aarch64, type: dmg }
+          - { os: windows-latest,   arch: amd64, java-arch: x64,    type: msi }
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
