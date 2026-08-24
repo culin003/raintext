@@ -22,6 +22,6 @@ jobs:
           done
           unzip -q gradle.zip
           GRADLE=$(pwd)/gradle-$VERSION/bin/gradle
-          "$GRADLE" help --stacktrace --no-daemon > /tmp/g.log 2>&1; echo "EXIT=$?"
-          echo "=== last 45 lines ==="
-          tail -45 /tmp/g.log
+          "$GRADLE" help --stacktrace --no-daemon > /tmp/g.log 2>&1 || true
+          echo "=== full g.log ==="
+          cat /tmp/g.log
