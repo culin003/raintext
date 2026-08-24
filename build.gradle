@@ -1,9 +1,24 @@
-plugins {
-    id 'java'
-    id 'application'
-    id 'org.openjfx.javafxplugin' version '0.1.0'
-    id 'org.beryx.jlink' version '3.0.1'
+buildscript {
+    repositories {
+        maven {
+            url = "https://maven.aliyun.com/repository/public"
+        }
+        maven {
+            url = "https://maven.aliyun.com/repository/google"
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'org.openjfx:javafx-plugin:0.1.0'
+        classpath 'org.beryx:badass-jlink-plugin:3.0.1'
+    }
 }
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'org.openjfx.javafxplugin'
+apply plugin: 'org.beryx.jlink'
 
 group = 'com.raintext'
 version = '1.0.0'
