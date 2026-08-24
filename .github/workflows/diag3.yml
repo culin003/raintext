@@ -1,0 +1,25 @@
+name: Diag3
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Run gradle help with stacktrace
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.gradle"
+          VERSION=8.10
+          for url in https://services.gradle.org/distributions/gradle-$VERSION-bin.zip https://mirrors.cloud.tencent.com/gradle/gradle-$VERSION-bin.zip https://github.com/culin003/raintext/releases/download/gradle-dist-v$VERSION/gradle-$VERSION-bin.zip; do
+            if curl -fsSL -o gradle.zip "$url"; then echo "downloaded from $url"; break; fi
+          done
+          unzip -q gradle.zip
+          GRADLE=$(pwd)/gradle-$VERSION/bin/gradle
+          "$GRADLE" help --stacktrace --no-daemon 2>&1 | tail -60
