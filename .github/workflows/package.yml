@@ -20,7 +20,7 @@ jobs:
           - { os: ubuntu-24.04-arm, arch: arm64, java-arch: aarch64, type: deb }
           - { os: macos-13,         arch: amd64, java-arch: x64,    type: dmg }
           - { os: macos-latest,     arch: arm64, java-arch: aarch64, type: dmg }
-          - { os: windows-latest,   arch: amd64, java-arch: x64,    type: msi }
+          - { os: windows-latest,   arch: amd64, java-arch: x64,    type: exe }
           # Windows arm64 has no GitHub-hosted runner. To build it, register a
           # self-hosted arm64 Windows runner and uncomment the line below:
           # - { os: [self-hosted, windows, arm64], arch: arm64, type: msi }
@@ -35,14 +35,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           architecture: ${{ matrix.java-arch }}
-
-      - name: Install WiX (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          Invoke-WebRequest -Uri https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip -OutFile wix.zip
-          Expand-Archive wix.zip -DestinationPath wix
-          echo "$env:GITHUB_WORKSPACE\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        shell: pwsh
 
       - name: Set up Gradle (download via curl, bypass the wrapper downloader)
         shell: bash
