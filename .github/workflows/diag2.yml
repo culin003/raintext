@@ -22,10 +22,19 @@ jobs:
           echo "=== java tcp ==="
           cat > Conn.java <<'EOF'
           import java.net.*;
+          import java.io.*;
           public class Conn { public static void main(String[] a) throws Exception {
-            for (String h: new String[]{"services.gradle.org","plugins.gradle.org","repo1.maven.org","maven.aliyun.com"}) {
-              try { Socket s=new Socket(); s.connect(new InetSocketAddress(InetAddress.getByName(h),443),5000); System.out.println(h+" JAVA OK"); s.close(); }
-              catch(Exception e){ System.out.println(h+" JAVA FAIL "+e); }
+            for (String u: new String[]{
+              "https://plugins.gradle.org/m2/org/openjfx/javafxplugin/org.openjfx.javafxplugin.gradle.plugin/0.1.0/org.openjfx.javafxplugin.gradle.plugin-0.1.0.pom",
+              "https://repo1.maven.org/maven2/org/openjfx/javafxplugin/org.openjfx.javafxplugin.gradle.plugin/0.1.0/org.openjfx.javafxplugin.gradle.plugin-0.1.0.pom",
+              "https://maven.aliyun.com/repository/gradle-plugin/org/openjfx/javafxplugin/org.openjfx.javafxplugin.gradle.plugin/0.1.0/org.openjfx.javafxplugin.gradle.plugin-0.1.0.pom"
+            }) {
+              try {
+                HttpURLConnection c=(HttpURLConnection)new URL(u).openConnection();
+                c.setInstanceFollowRedirects(true); c.setConnectTimeout(8000); c.setReadTimeout(8000);
+                int code=c.getResponseCode();
+                System.out.println(code+" "+u);
+              } catch(Exception e){ System.out.println("FAIL "+e+" "+u); }
             }
           }}
           EOF
