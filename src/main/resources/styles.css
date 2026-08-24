@@ -1,0 +1,102 @@
+* {
+    -fx-font-family: "Maple Mono CN";
+    -fx-font-size: 14px;
+}
+
+.root {
+    -fx-background-color: #ffffff;
+}
+
+.list-cell {
+    -fx-padding: 2 5 2 5;
+    -fx-font-family: "Maple Mono CN";
+}
+
+.list-cell:odd {
+    -fx-background-color: #f8f8f8;
+}
+
+.list-cell:even {
+    -fx-background-color: #ffffff;
+}
+
+.list-cell:selected {
+    -fx-background-color: #3399ff;
+    -fx-text-fill: white;
+}
+
+.status-bar {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1 0 0 0;
+}
+
+.menu-bar {
+    -fx-background-color: #f8f8f8;
+}
+
+.menu-item:focused {
+    -fx-background-color: #3399ff;
+}
+
+.text-field {
+    -fx-padding: 5;
+    -fx-font-family: "Maple Mono CN";
+}
+
+.text-area .scroll-bar:vertical {
+    -fx-opacity: 0;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+}
+
+.text-area .scroll-bar:vertical .track,
+.text-area .scroll-bar:vertical .thumb,
+.text-area .scroll-bar:vertical .increment-button,
+.text-area .scroll-bar:vertical .decrement-button,
+.text-area .scroll-bar:vertical .increment-arrow,
+.text-area .scroll-bar:vertical .decrement-arrow {
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane {
+    -fx-padding: 0;
+}
+
+.text-area .scroll-bar:horizontal {
+    -fx-pref-height: 14;
+}
+
+.text-area .scroll-bar:horizontal .thumb {
+    -fx-background-color: #c0c0c0;
+    -fx-background-radius: 4;
+}
+
+.text-area .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #a0a0a0;
+}
+
+.text-area .scroll-bar:horizontal .track {
+    -fx-background-color: #f0f0f0;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 14;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #c0c0c0;
+    -fx-background-radius: 4;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a0a0a0;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: #f0f0f0;
+}

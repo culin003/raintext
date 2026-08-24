@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        maven {
+            url = "https://maven.aliyun.com/repository/gradle-plugin"
+            allowInsecureProtocol = false
+        }
+        maven {
+            url = "https://maven.aliyun.com/repository/google"
+            allowInsecureProtocol = false
+        }
+        maven {
+            url = "https://maven.aliyun.com/repository/central"
+            allowInsecureProtocol = false
+        }
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'raintext'
