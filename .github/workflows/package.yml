@@ -45,17 +45,31 @@ jobs:
           echo "$env:GITHUB_WORKSPACE\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         shell: pwsh
 
-      - name: Grant execute permission for gradlew
-        if: runner.os != 'Windows'
-        run: chmod +x gradlew
+      - name: Set up Gradle (download via curl, bypass the wrapper downloader)
+        shell: bash
+        run: |
+          for url in \
+            "https://services.gradle.org/distributions/gradle-8.10-bin.zip" \
+            "https://mirrors.cloud.tencent.com/gradle/gradle-8.10-bin.zip" \
+            "https://github.com/culin003/raintext/releases/download/gradle-dist-v8.10/gradle-8.10-bin.zip" ; do
+            echo "trying $url"
+            if curl -fsSL -o gradle.zip "$url"; then echo "downloaded from $url"; break; fi
+          done
+          ls -la gradle.zip
+          unzip -q gradle.zip
+          echo "GRADLE=$PWD/gradle-8.10/bin/gradle" >> "$GITHUB_ENV"
 
       - name: Build package (Unix)
         if: runner.os != 'Windows'
-        run: ./gradlew jpackage -PinstallerType=${{ matrix.type }} --no-daemon
+        shell: bash
+        run: |
+          chmod +x "$GRADLE"
+          "$GRADLE" jpackage -PinstallerType=${{ matrix.type }} --no-daemon
 
       - name: Build package (Windows)
         if: runner.os == 'Windows'
-        run: .\gradlew.bat jpackage -PinstallerType=${{ matrix.type }} --no-daemon
+        shell: bash
+        run: "$GRADLE" jpackage -PinstallerType=${{ matrix.type }} --no-daemon
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
